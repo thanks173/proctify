@@ -54,12 +54,12 @@ func (w *Watcher) watch() {
 
 		pDir, err := os.Open("/proc")
 		if err != nil {
-			w.Errors <- err
+			w.Errors <- newError(err)
 			return
 		}
 		names, err := pDir.Readdirnames(0)
 		if err != nil {
-			w.Errors <- err
+			w.Errors <- newError(err)
 			pDir.Close()
 			continue
 		}
@@ -98,7 +98,7 @@ func (w *Watcher) watch() {
 			p := &linuxProcess{pid: pid}
 			err := p.reload()
 			if err != nil {
-				w.Errors <- err
+				w.Errors <- newError(err)
 				continue
 			}
 			w.currents[p.Pid()] = p
@@ -116,7 +116,7 @@ func (w *Watcher) watch() {
 			updateProcess := &linuxProcess{pid: pid}
 			err := updateProcess.reload()
 			if err != nil {
-				w.Errors <- err
+				w.Errors <- newError(err)
 				continue
 			}
 
