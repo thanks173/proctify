@@ -27,6 +27,8 @@ type linuxProcess struct {
 	uid int
 }
 
+var statRegex = regexp.MustCompile(`\(+(.+?)\)+\s*(\w+)\s*(\d+)`)
+
 func (p *linuxProcess) Pid() int {
 	return p.pid
 }
@@ -142,8 +144,8 @@ func (p *linuxProcess) reload() error {
 	}
 
 	data := string(dataBytes)
-	r := regexp.MustCompile(`\(+(.+?)\)+\s*(\w+)\s*(\d+)`)
-	match := r.FindStringSubmatch(data)
+
+	match := statRegex.FindStringSubmatch(data)
 
 	if len(match) != 4 {
 		return errors.New("can't parse stat info")
