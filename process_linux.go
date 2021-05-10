@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 )
 
 // linuxProcess is an implementation of Process from Linux
@@ -66,8 +67,20 @@ func (p *linuxProcess) Uid() int {
 }
 
 func runningProcesses() ([]Process, error) {
-	pDir, err := os.Open("/proc")
-	if err != nil {
+	var pDir *os.File
+	var err error
+	attempt := 0
+	for {
+		pDir, err = os.Open("/proc")
+		if err == nil {
+			break
+		}
+
+		if attempt < 10 {
+			attempt++
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
 		return nil, err
 	}
 	defer pDir.Close()
